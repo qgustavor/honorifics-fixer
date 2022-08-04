@@ -45,4 +45,4 @@ handleSubtitles(options) // return a promise
 - `transliterationRules`: if defined it sets the rules used in the transliteration mode
 - `nameMap`: if defined it sets a object that maps names to transliterations
 
-Check `lib/rules` folder to check the pre-loaded rules and name map.
+Check `libs/rules` folder to check the pre-loaded rules and name map.
