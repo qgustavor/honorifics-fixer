@@ -365,7 +365,7 @@ async function getNames (folder, referenceEvents, options, rules) {
       return overlap > 0.1
     }).map(normalizeReferenceText)).flat()))
     
-    // FIX ME: improve name matching algoritmn
+    // FIX ME: improve name matching algorithm
 
     const minOccurrence = Math.ceil(events.length * 0.3)
     const candidates = substrings(intervalReferences, {
@@ -400,7 +400,7 @@ function normalizeReferenceText (event) {
   return hanzist.fullwidthCase(simplifiedText, ['Katakana'])
     // Remove control codes
     .replace(/\p{C}/gu, '')
-    // Remove espaces
+    // Remove spaces
     .replace(/\s+/g, '')
     // Remove ～ from さ～ん
     .replace(/～/g, '')
