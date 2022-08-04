@@ -183,7 +183,7 @@ module.exports = {
   'Mezato': '米里',
   'Sho': 'ショウ',
   // Komi
-  'Tadano': '‪只野',
+  'Tadano': '只野',
   'Agari': '上理',
   'Komi': '古見',
   // Chihayafuru 2
