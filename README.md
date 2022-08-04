@@ -40,6 +40,9 @@ handleSubtitles(options) // return a promise
 - `singleEpisode`: assume just a single episode was inputted and do not try to pair source and reference files using episode numbers
 - `forceInvertNames`: force name inversion in case the reference subtitle got the names inverted
 - `avoidDuplicate`: set to `true` to not duplicate honorifics in case they already exist in inconsistent subtitles
-- `targetLanguage`: the language used in the source/target subtitles, used for the rules, default to `pt`
+- `targetLanguage`: the language used in the source/target subtitles, used when loading pre-loaded rules, default to `pt`
+- `translationRules`: if defined it sets the rules used in the translation mode
+- `transliterationRules`: if defined it sets the rules used in the transliteration mode
+- `nameMap`: if defined it sets a object that maps names to transliterations
 
-Currently is not possible to create new rules or edit existent ones without editing the libs/rules folder.
+Check `lib/rules` folder to check the pre-loaded rules and name map.
