@@ -6,7 +6,7 @@
 
 Because of [this script](https://github.com/qgustavor/subtitle-comments/) I know there was a translator that wrote in a subtitle "Brazilian people will not like this, but 'whatever'".
 
-Before reading that I did not cared about honorifics, but if some translator knew people would not like their translation and just said "whatever" I don't need to accept that.
+Before reading that I didn't care about honorifics, but if some translator knew people would not like their translation and just said "whatever" I don't need to accept that.
 
 So I made this script.
 
