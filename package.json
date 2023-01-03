@@ -1,6 +1,6 @@
 {
   "name": "honorifics-fixer",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Apply honorifics to a subtitle using other as a reference.",
   "type": "module",
   "main": "index.js",
