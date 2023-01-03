@@ -67,4 +67,4 @@ const nameNormalizationFns = [
   e => e
 ]
 
-exports.rules = { titles, honorifics, knownAdaptationsRegex, nameNormalizationFns }
+export const rules = { titles, honorifics, knownAdaptationsRegex, nameNormalizationFns }

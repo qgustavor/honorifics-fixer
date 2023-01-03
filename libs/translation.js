@@ -1,23 +1,21 @@
-const { parsedStart, parsedEnd } = require('./helpers')
-
-function handleEventsFromTranslation (sourceEvents, referenceEvents, options) {
+export async function handleEventsFromTranslation (sourceEvents, referenceEvents, options) {
   const forceInvertNames = options.forceInvertNames
   const skipInvertNames = options.skipInvertNames
   const avoidDuplicate = options.avoidDuplicate
   let foundReplacement = false
-  
+
   let rules = options.translationRules
   if (!rules) {
     if (!options.targetLanguage) options.targetLanguage = 'pt'
     const langNormalized = options.targetLanguage.toLowerCase().replace(/[^a-z]/g, '')
-    rules = require('./rules/translation.' + langNormalized + '.js').rules
+    rules = (await import('./rules/translation.' + langNormalized + '.js')).rules
   }
   const { senpaiRegex, knownAdaptationsRegex } = rules
 
   for (const srcEvt of sourceEvents) {
     const refEvts = referenceEvents.filter(ref => {
-      const overlap = Math.min(srcEvt[parsedEnd], ref[parsedEnd]) -
-        Math.max(srcEvt[parsedStart], ref[parsedStart])
+      const overlap = Math.min(srcEvt.End, ref.End) -
+        Math.max(srcEvt.Start, ref.Start)
       return overlap > 0.5
     })
 
@@ -58,6 +56,13 @@ function handleEventsFromTranslation (sourceEvents, referenceEvents, options) {
       }
     }
 
+    // Try to replace adaptations
+    for (const match of evtTxt.matchAll(knownAdaptationsRegex)) {
+      if (!foundHonorifics[0]) break
+      replacements.push([match, foundHonorifics[0]])
+      foundHonorifics.splice(0, 1)
+    }
+
     // Try to replace honorific omissions
     for (const match of evtTxt.matchAll(/\p{Lu}\p{L}+/gu)) {
       const prefix = match[0].slice(0, 2)
@@ -68,13 +73,6 @@ function handleEventsFromTranslation (sourceEvents, referenceEvents, options) {
         replacements.push([match, honorific])
       }
       foundHonorifics.splice(matchingIndex, 1)
-    }
-
-    // Try to replace adaptations
-    for (const match of evtTxt.matchAll(knownAdaptationsRegex)) {
-      if (!foundHonorifics[0]) break
-      replacements.push([match, foundHonorifics[0]])
-      foundHonorifics.splice(0, 1)
     }
 
     if (replacements.length === 0) continue
@@ -96,5 +94,3 @@ function handleEventsFromTranslation (sourceEvents, referenceEvents, options) {
 
   return foundReplacement
 }
-
-exports.handleEventsFromTranslation = handleEventsFromTranslation

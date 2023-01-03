@@ -71,4 +71,4 @@ const nameNormalizationFns = [
   e => e.replace(/(zinh|nh)([ao])$/, 'cchan')
 ]
 
-exports.rules = { titles, honorifics, knownAdaptationsRegex, nameNormalizationFns }
+export const rules = { titles, honorifics, knownAdaptationsRegex, nameNormalizationFns }

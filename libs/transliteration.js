@@ -1,18 +1,18 @@
-const { getEvents, parsedStart, parsedEnd } = require('./helpers')
-const substrings = require('common-substrings')
-const hanzist = require('hanzist')
-const path = require('path')
-const fs = require('fs')
+import { getEvents } from './helpers.js'
+import substrings from 'common-substrings'
+import hanzist from 'hanzist'
+import path from 'path'
+import fs from 'fs'
 
-async function handleEventsFromTransliteration (sourceEvents, referenceEvents, options) {
+export async function handleEventsFromTransliteration (sourceEvents, referenceEvents, options) {
   const sourceFolder = options.sourceDirectory || path.dirname(options.sourceFiles[0])
   let foundReplacement = false
-  
+
   let rules = options.transliterationRules
   if (!rules) {
     if (!options.targetLanguage) options.targetLanguage = 'pt'
     const langNormalized = options.targetLanguage.toLowerCase().replace(/[^a-z]/g, '')
-    rules = require('./rules/transliteration.' + langNormalized + '.js').rules
+    rules = (await import('./rules/transliteration.' + langNormalized + '.js')).rules
   }
   const { titles, honorifics, knownAdaptationsRegex, nameNormalizationFns } = rules
   const { names, nameMap } = await getNames(sourceFolder, referenceEvents, options, rules)
@@ -74,8 +74,8 @@ async function handleEventsFromTransliteration (sourceEvents, referenceEvents, o
       let evtTxt = srcEvt.Text.replace(/\\N/g, '\n')
       const originalEvtTxt = evtTxt
       const refEvts = refEvents.filter(ref => {
-        const overlap = Math.min(srcEvt[parsedEnd], ref.event[parsedEnd]) -
-          Math.max(srcEvt[parsedStart], ref.event[parsedStart])
+        const overlap = Math.min(srcEvt.End, ref.event.End) -
+          Math.max(srcEvt.Start, ref.event.Start)
         return overlap > 0.1
       })
       const refTextNormalized = refEvts.map(e => e.normalizedText).join(' ')
@@ -302,7 +302,7 @@ async function getNames (folder, referenceEvents, options, rules) {
   }
 
   let names = {}
-  let nameEvents = {}
+  const nameEvents = {}
   const languageEvents = {}
   for (const sibling of relatedFiles) {
     const siblingPath = typeof sibling === 'string' ? sibling : sibling.path
@@ -313,7 +313,7 @@ async function getNames (folder, referenceEvents, options, rules) {
     languageEvents[language] = languageEvents[language].concat(events)
   }
 
-  for (let events of Object.values(languageEvents)) {
+  for (const events of Object.values(languageEvents)) {
     const siblingNames = new Set()
     for (const event of events) {
       const eventNames = event.Text
@@ -340,9 +340,9 @@ async function getNames (folder, referenceEvents, options, rules) {
   console.log('Detected names:', names.join(', '))
 
   // Match found names with reference subtitle based on where they appear
-  const knownNames = require('./rules/known-names')
+  const { knownNames } = await import('./rules/known-names.js')
   names = names.concat(Object.keys(knownNames))
-  
+
   const nameMap = Object.assign({}, knownNames)
   if (options.nameMap) {
     Object.assign(nameMap, options.nameMap)
@@ -356,15 +356,15 @@ async function getNames (folder, referenceEvents, options, rules) {
     if (events.length < 5) continue
 
     const intervals = events
-      .map(e => [e[parsedStart], e[parsedEnd]])
+      .map(e => [e.Start, e.End])
       .sort((a, b) => a[0] - b[0])
 
     const intervalReferences = Array.from(new Set(intervals.map(e => referenceEvents.filter(evt => {
-      const overlap = Math.min(e[1], evt[parsedEnd]) -
-        Math.max(e[0], evt[parsedStart])
+      const overlap = Math.min(e[1], evt.End) -
+        Math.max(e[0], evt.Start)
       return overlap > 0.1
     }).map(normalizeReferenceText)).flat()))
-    
+
     // FIX ME: improve name matching algorithm
 
     const minOccurrence = Math.ceil(events.length * 0.3)
@@ -418,5 +418,3 @@ function normalizeReferenceText (event) {
     .replace(/ミドリ/g, '翠')
     .trim()
 }
-
-exports.handleEventsFromTransliteration = handleEventsFromTransliteration

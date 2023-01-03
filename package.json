@@ -2,6 +2,7 @@
   "name": "honorifics-fixer",
   "version": "1.0.0",
   "description": "Apply honorifics to a subtitle using other as a reference.",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "standard"
@@ -10,14 +11,16 @@
   "author": "qgustavor",
   "license": "MIT",
   "dependencies": {
+    "@qgustavor/ass-parser": "^0.4.1",
+    "@qgustavor/ass-stringify": "^0.3.1",
     "anitomy-js": "^5.0.0",
-    "ass-parser": "^0.2.0",
-    "ass-stringify": "^0.1.3",
     "common-substrings": "^3.0.1",
     "glob": "^7.1.6",
     "hanzist": "^0.0.13",
     "natural-orderby": "^2.0.3",
-    "standard": "^16.0.3",
-    "yargs": "^16.2.0"
+    "yargs-parser": "^21.1.1"
+  },
+  "devDependencies": {
+    "standard": "^16.0.3"
   }
 }

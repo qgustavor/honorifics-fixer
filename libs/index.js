@@ -1,17 +1,17 @@
-const { fixName, getEvents } = require('./helpers')
-const stringify = require('ass-stringify')
-const anitomy = require('anitomy-js')
-const glob = require('glob')
-const util = require('util')
-const path = require('path')
-const fs = require('fs')
-const { orderBy } = require('natural-orderby')
-const { handleEventsFromTranslation } = require('./translation')
-const { handleEventsFromTransliteration } = require('./transliteration')
+import { fixName, getEvents } from './helpers.js'
+import stringify from '@qgustavor/ass-stringify'
+import anitomy from 'anitomy-js'
+import glob from 'glob'
+import util from 'util'
+import path from 'path'
+import fs from 'fs'
+import { orderBy } from 'natural-orderby'
+import { handleEventsFromTranslation } from './translation.js'
+import { handleEventsFromTransliteration } from './transliteration.js'
 
 const globPromise = util.promisify(glob)
 
-async function handleSubtitles (options) {
+export default async function handleSubtitles (options) {
   const sourceDirectory = options.sourceDirectory
   const targetDirectory = options.targetDirectory || options.sourceDirectory
   const referenceDirectory = options.referenceDirectory || options.sourceDirectory
@@ -60,7 +60,7 @@ async function handleSubtitles (options) {
   for (const [source, reference] of mappedSources) {
     console.log('Got', source)
 
-    const [sourceEvents, sourceParsed, sourceData] = await getEvents(sourceDirectory, source)
+    const [sourceEvents, sourceParsed, stringifyConfig] = await getEvents(sourceDirectory, source)
     const [referenceEvents] = await getEvents(referenceDirectory, reference)
 
     if (referenceEvents.length < 5) throw Error(`Too few reference events: ${referenceEvents.length}`)
@@ -80,21 +80,16 @@ async function handleSubtitles (options) {
       .replace(/((?:.(?!-\d+\.[a-z])){10,80}.).*(-\d+\.[a-z])/, '$1$2')
       .replace(/\.ass$/, '.honorifics.ass')
 
-    // Keep format lines spacing
-    const originalFormatLines = sourceData.split(/\r?\n/g).filter(e => e.startsWith('Format: '))
-
     const newPath = targetFiles
       ? targetFiles[sourceFiles.indexOf(source)]
       : targetDirectory
         ? path.resolve(targetDirectory, newName)
         : newName
-    const newData = stringify(sourceParsed)
-      .replace(/^Format: .*/gm, () => originalFormatLines.shift())
+
+    const newData = stringify(sourceParsed, stringifyConfig)
     await fs.promises.writeFile(newPath, newData)
     newSubtitles.push(newPath)
   }
 
   return { newSubtitles }
 }
-
-module.exports = handleSubtitles
